@@ -1,10 +1,7 @@
 resource "openstack_lb_loadbalancer_v2" "lb" {
   name            = "lb-2w"
   vip_subnet_id   = openstack_networking_subnet_v2.private.id
-  depends_on      = [
-    openstack_compute_instance_v2.web01,
-    openstack_compute_instance_v2.web02
-  ]
+  depends_on      = [ openstack_compute_instance_v2.web ]
 
   timeouts {
     create = var.timeout
@@ -34,16 +31,10 @@ resource "openstack_lb_pool_v2" "web" {
   depends_on  = [ openstack_lb_listener_v2.http ]
 }
 
-resource "openstack_lb_member_v2" "web01" {
-  address       = openstack_compute_instance_v2.web01.access_ip_v4
-  protocol_port = 80
-  pool_id       = openstack_lb_pool_v2.web.id
-  subnet_id     = openstack_networking_subnet_v2.private.id
-  depends_on    = [ openstack_lb_pool_v2.web ]
-}
+resource "openstack_lb_member_v2" "web" {
+  count = length(var.instances)
 
-resource "openstack_lb_member_v2" "web02" {
-  address       = openstack_compute_instance_v2.web02.access_ip_v4
+  address       = openstack_compute_instance_v2.web[count.index].access_ip_v4
   protocol_port = 80
   pool_id       = openstack_lb_pool_v2.web.id
   subnet_id     = openstack_networking_subnet_v2.private.id
@@ -59,8 +50,5 @@ resource "openstack_lb_monitor_v2" "web" {
   delay           = 2
   timeout         = 2
   max_retries     = 2
-  depends_on      = [
-    openstack_lb_member_v2.web01,
-    openstack_lb_member_v2.web02
-  ]
+  depends_on      = [ openstack_lb_member_v2.web ]
 }

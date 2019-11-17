@@ -12,3 +12,10 @@ variable "flavor" {
   type    = string
   default = "d1.micro"
 }
+
+variable "instances" {
+  type    = list(string)
+  default = [
+    "web01", "web02"
+  ]
+}
