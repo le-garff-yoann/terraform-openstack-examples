@@ -13,8 +13,9 @@ export \
 
 terraform init
 
-terraform plan
+terraform plan -out=$OS_TENANT_NAME.tfplan
+terraform apply $OS_TENANT_NAME.tfplan
 
-terraform apply -auto-approve
-terraform destroy -auto-approve
+terraform plan -destroy -out=$OS_TENANT_NAME.tfplan
+terraform apply $OS_TENANT_NAME.tfplan
 ```
