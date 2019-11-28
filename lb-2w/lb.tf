@@ -11,7 +11,7 @@ resource "openstack_lb_loadbalancer_v2" "lb" {
 
 resource "openstack_networking_floatingip_v2" "lb" {
   pool    = "public"
-  port_id = "${openstack_lb_loadbalancer_v2.lb.vip_port_id}"
+  port_id = openstack_lb_loadbalancer_v2.lb.vip_port_id
   depends_on      = [ openstack_lb_loadbalancer_v2.lb ]
 }
 
